@@ -13,6 +13,8 @@ RUN apt-get update \
     openssh-server \
     git \
     gitweb \
+    nginx \
+    fcgiwrap \
  && sed --in-place --regexp-extended \
     --expression 's|^#(PasswordAuthentication\s+).*|\1no|' \
     --expression 's|^#(GatewayPorts\s+).*|\1yes|' \
@@ -21,10 +23,10 @@ RUN apt-get update \
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY sshd/ /etc/sshd/
+COPY bin/start.sh /opt/start.sh
 
 VOLUME /config
 
 EXPOSE ${SSHD_PORT}
 
-CMD ["/etc/sshd/start.sh"]
+CMD ["/opt/start.sh"]
