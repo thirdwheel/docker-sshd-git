@@ -1,15 +1,9 @@
-FROM bmoorman/ubuntu:focal
-
-ARG DEBIAN_FRONTEND=noninteractive
+FROM alpine:3.14
 
 ENV SSHD_PORT=22
 
-RUN apt-get update \
- && apt-get install --yes --no-install-recommends \
-    dnsutils \
-    iputils-ping \
-    mtr-tiny \
-    net-tools \
+RUN apk update \
+ && apk add --no-cache \
     openssh-server \
     git \
     gitweb \
@@ -19,9 +13,7 @@ RUN apt-get update \
     --expression 's|^#(PasswordAuthentication\s+).*|\1no|' \
     --expression 's|^#(GatewayPorts\s+).*|\1yes|' \
     /etc/ssh/sshd_config \
- && apt-get autoremove --yes --purge \
- && apt-get clean \
- && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ && rm --recursive --force /tmp/* /var/tmp/*
 
 COPY bin/start.sh /opt/start.sh
 
