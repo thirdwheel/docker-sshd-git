@@ -2,11 +2,11 @@
 
 SSHD_KEY_LOC=/etc/ssh/keys/
 
-for SSHD_USER in ${SSHD_USERS}
+for SSHD_USER in gituser gitreader
 do
     if ! getent passwd ${SSHD_USER} > /dev/null
     then
-        useradd --shell /bin/bash --create-home ${SSHD_USER}
+        useradd --shell /usr/bin/git-shell --create-home ${SSHD_USER}
         install --owner ${SSHD_USER} --group ${SSHD_USER} --mode 700 --directory /home/${SSHD_USER}/.ssh
         if [ -f "${SSHD_KEY_LOC}/${SSHD_USER}" ]
         then
