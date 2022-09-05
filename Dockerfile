@@ -17,7 +17,7 @@ RUN apk update \
 
 COPY bin/start.sh /opt/start.sh
 
-VOLUME /config
+VOLUME [ "/opt/config", "/opt/git/public", "/opt/git/private" ]
 
 EXPOSE ${SSHD_PORT}
 
