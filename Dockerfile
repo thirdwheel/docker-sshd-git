@@ -6,7 +6,7 @@ RUN apk update \
  && apk add --no-cache \
     openssh-server \
     git \
-    gitweb \
+    git-gitweb \
     nginx \
     fcgiwrap \
  && sed --in-place --regexp-extended \
@@ -16,6 +16,8 @@ RUN apk update \
  && rm --recursive --force /tmp/* /var/tmp/*
 
 COPY bin/start.sh /opt/start.sh
+COPY etc/httpd-default.conf /etc/nginx/http.d/default.conf
+COPY etc/gitweb.conf /etc/gitweb.conf
 
 VOLUME [ "/opt/config", "/opt/git/public", "/opt/git/private" ]
 
