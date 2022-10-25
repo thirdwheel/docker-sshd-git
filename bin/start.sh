@@ -56,16 +56,16 @@ sleep 5
 chmod g+w ${FCGIWRAP_SOCK}
 
 # nginx
-if [ -f /opt/config/httpd-default.conf ]
+if [ -f /config/httpd-default.conf ]
 then
-    cp /opt/config/httpd-default.conf /etc/nginx/http.d/default.conf
+    cp /config/httpd-default.conf /etc/nginx/http.d/default.conf
 else
     sed -i 's/\$SERVER_NAME/'$(hostname -f)'/g' /etc/nginx/http.d/default.conf
-    cp /etc/nginx/http.d/default.conf /opt/config/httpd-default.conf
+    cp /etc/nginx/http.d/default.conf /config/httpd-default.conf
 fi
-[ -f /opt/config/httpd-ssl.conf ] && cp /opt/config/httpd-ssl.conf /etc/nginx/http.d/ssl.conf
-[ -f /opt/config/ssl.crt ] && install -o root -g root -m 0644 /opt/config/ssl.crt /etc/ssl/certs/httpd.crt
-[ -f /opt/config/ssl.key ] && install -o root -g root -m 0640 /opt/config/ssl.key /etc/ssl/private/httpd.key
+[ -f /config/httpd-ssl.conf ] && cp /config/httpd-ssl.conf /etc/nginx/http.d/ssl.conf
+[ -f /config/ssl.crt ] && install -o root -g root -m 0644 /config/ssl.crt /etc/ssl/certs/httpd.crt
+[ -f /config/ssl.key ] && install -o root -g root -m 0640 /config/ssl.key /etc/ssl/private/httpd.key
 echo Starting nginx...
 nginx -c /etc/nginx/nginx.conf || exit 1
 
