@@ -24,6 +24,7 @@ do
     if ! getent passwd ${SSHD_USER} > /dev/null
     then
         adduser -s /usr/bin/git-shell -D -G git ${SSHD_USER}
+        passwd -d ${SSHD_USER}
         install --owner ${SSHD_USER} --group git --mode 700 --directory "/home/${SSHD_USER}/.ssh"
         if [ -f "${SSHD_KEY_LOC}/${SSHD_USER}" ]
         then
@@ -81,7 +82,7 @@ nginx -c /etc/nginx/nginx.conf || exit 1
 
 # sshd
 echo Starting sshd...
-/usr/sbin/sshd -p ${SSHD_PORT} || exit 2
+/usr/sbin/sshd -e || exit 2
 
 # Set the TERM trap so this docker closes gracefully (and hopefully quickly!)
 
