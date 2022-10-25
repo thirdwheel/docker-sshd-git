@@ -2,16 +2,6 @@
 
 SSHD_KEY_LOC=/config/ssh/keys
 
-cleanup()
-{
-    kill `jobs -p`
-    nginx -s stop
-    pkill sshd
-    rm -f $FCGIWRAP_SOCK
-
-    wait
-}
-
 if [ ! -d $SSHD_KEY_LOC ]
 then
     install --directory $SSHD_KEY_LOC
@@ -59,12 +49,13 @@ FCGIWRAP_USER=fcgiwrap
 FCGIWRAP_GRP=www-data
 FCGIWRAP_SOCK=/run/fcgiwrap/fcgiwrap.sock
 [ -d /run/fcgiwrap ] || mkdir -p /run/fcgiwrap
+[ -S "${FCGIWRAP_SOCK}" ] && rm -f "${FCGIWRAP_SOCK}"
 chown ${FCGIWRAP_USER}:${FCGIWRAP_GRP} /run/fcgiwrap
 echo Starting fcgiwrap...
-sudo -u $FCGIWRAP_USER $(which fcgiwrap) -c $(nproc) -s unix:${FCGIWRAP_SOCK} &
+sudo -u $FCGIWRAP_USER $(which fcgiwrap) -c $(nproc) -s unix:"${FCGIWRAP_SOCK}" &
 sleep 5
-[ -S ${FCGIWRAP_SOCK} ] || exit 3
-chmod g+w ${FCGIWRAP_SOCK}
+[ -S "${FCGIWRAP_SOCK}" ] || exit 3
+chmod g+w "${FCGIWRAP_SOCK}"
 
 # nginx
 if [ -f /config/httpd-default.conf ]
@@ -83,10 +74,6 @@ nginx -c /etc/nginx/nginx.conf || exit 1
 # sshd
 echo Starting sshd...
 /usr/sbin/sshd -e || exit 2
-
-# Set the TERM trap so this docker closes gracefully (and hopefully quickly!)
-trap cleanup EXIT
-trap cleanup TERM
 
 # SSH authorised keys update
 echo Starting ssh authorised keys update...
