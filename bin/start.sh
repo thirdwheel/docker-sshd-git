@@ -26,13 +26,13 @@ do
         adduser -s /usr/bin/git-shell -D -G git ${SSHD_USER}
         passwd -d ${SSHD_USER}
         install --owner ${SSHD_USER} --group git --mode 700 --directory "/home/${SSHD_USER}/.ssh"
-        if [ -f "${SSHD_KEY_LOC}/${SSHD_USER}" ]
-        then
-            install --owner ${SSHD_USER} --group git --mode 700 "${SSHD_KEY_LOC}/${SSHD_USER}" "/home/${SSHD_USER}/.ssh/authorized_keys"
-        else
-            echo "NOTE: user ${SSHD_USER} has no authorized_keys file - access will not be possible. Empty file created."
-            touch "${SSHD_KEY_LOC}/${SSHD_USER}" "/home/${SSHD_USER}/.ssh/authorized_keys"
-        fi
+    fi
+    if [ -f "${SSHD_KEY_LOC}/${SSHD_USER}" ]
+    then
+        install --owner ${SSHD_USER} --group git --mode 700 "${SSHD_KEY_LOC}/${SSHD_USER}" "/home/${SSHD_USER}/.ssh/authorized_keys"
+    else
+        echo "NOTE: user ${SSHD_USER} has no authorized_keys file - access will not be possible. Empty file created."
+        touch "${SSHD_KEY_LOC}/${SSHD_USER}" "/home/${SSHD_USER}/.ssh/authorized_keys"
     fi
 done
 
