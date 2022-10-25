@@ -85,6 +85,8 @@ echo Starting sshd...
 /usr/sbin/sshd -e || exit 2
 
 # Set the TERM trap so this docker closes gracefully (and hopefully quickly!)
+trap cleanup EXIT
+trap cleanup TERM
 
 # SSH authorised keys update
 echo Starting ssh authorised keys update...
@@ -95,6 +97,3 @@ do
         install --owner ${SSHD_USER} --group git --mode 700 "${SSHD_KEY_LOC}/${SSHD_USER}" /home/${SSHD_USER}/.ssh/authorized_keys
     done
 done
-
-trap cleanup EXIT
-trap cleanup TERM
