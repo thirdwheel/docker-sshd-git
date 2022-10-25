@@ -2,6 +2,16 @@
 
 SSHD_KEY_LOC=/config/ssh/keys
 
+cleanup()
+{
+    kill `jobs -p`
+    nginx -s stop
+    pkill sshd
+    rm -f $FCGIWRAP_SOCK
+
+    wait
+}
+
 if [ ! -d $SSHD_KEY_LOC ]
 then
     install --directory $SSHD_KEY_LOC
@@ -73,6 +83,8 @@ nginx -c /etc/nginx/nginx.conf || exit 1
 echo Starting sshd...
 /usr/sbin/sshd -p ${SSHD_PORT} || exit 2
 
+# Set the TERM trap so this docker closes gracefully (and hopefully quickly!)
+
 # SSH authorised keys update
 echo Starting ssh authorised keys update...
 while sleep 60
@@ -82,3 +94,6 @@ do
         install --owner ${SSHD_USER} --group git --mode 700 "${SSHD_KEY_LOC}/${SSHD_USER}" /home/${SSHD_USER}/.ssh/authorized_keys
     done
 done
+
+trap cleanup EXIT
+trap cleanup TERM
