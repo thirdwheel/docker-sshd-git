@@ -2,6 +2,20 @@
 
 SSHD_KEY_LOC=/config/ssh/keys
 
+GIT_PUBLIC=/opt/git/public
+GIT_PRIVATE=/opt/git/private
+
+if [ ! -d "$GIT_PUBLIC" ]
+then
+    echo "Public git directory not mounted - please --mount this directory" >&2
+    exit 4
+fi
+if [ ! -d "$GIT_PRIVATE" ]
+then
+    echo "Private git directory not mounted - please --mount this directory" >&2
+    exit 5
+fi
+
 if [ ! -d $SSHD_KEY_LOC ]
 then
     install --directory $SSHD_KEY_LOC
@@ -26,15 +40,17 @@ do
     fi
 done
 
-for HOST_KEY in /etc/ssh/ssh_host_*_key
+for TYPE in ecdsa rsa dsa ed25519
 do
-    TYPE=$(echo ${HOST_KEY##*/} | cut -d_ -f3)
+    config_key=$SSHD_KEY_LOC/ssh_host_${TYPE}_key
+    local_key=/etc/ssh/ssh_host_${TYPE}_key
     # If not already in the config partition, copy them there
-    if [ ! -f $SSHD_KEY_LOC/ssh_host_${TYPE}_key ]; then
-        cp /etc/ssh/ssh_host_${TYPE}_key* $SSHD_KEY_LOC
+    if [ ! -f $config_key ]; then
+        echo Generating $TYPE SSH key...
+        ssh-keygen -q -f $config_key -N '' -t $TYPE
     fi
-    rm -f /etc/ssh/ssh_host_${TYPE}_key*
-    ln -s $SSHD_KEY_LOC/ssh_host_${TYPE}_key* /etc/ssh
+    rm -f ${local_key}*
+    ln -s ${config_key}* /etc/ssh
 done
 
 if [ ! -d /var/run/sshd ]
